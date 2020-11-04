@@ -20,6 +20,9 @@ services:
       - mysql
   mysql:
     image: mysql:5.7
+    # No need ports configuration if you do not use any GUI of DB tools on your host machines.
+    ports:
+      - '3306:3306'
     env_file:
       - ./env/mysql.env
   composer:
@@ -28,5 +31,16 @@ services:
       dockerfile: composer.dockerfile
     volumes:
       - ./src:/var/www/html
-  # artisan:
-  # npm
+  artisan:
+    build:
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+    volumes:
+      - ./src:/var/www/html
+    entrypoint: ['php', '/var/www/html/artisan']
+  npm:
+    image: node:14
+    working_dir: /var/www/html
+    entrypoint: ['npm']
+    volumes:
+      - ./src:/var/www/html
